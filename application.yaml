@@ -1,0 +1,40 @@
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Channel
+metadata:
+  name: github-knawd-deployer-yaml
+  namespace: knawd
+spec:
+  pathname: https://knawd.github.io/deployer/index.yaml
+  type: HelmRepo
+---
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: knawd-deployer
+  namespace: knawd
+spec:
+  componentKinds:
+  - group: apps.open-cluster-management.io
+    kind: Subscription
+  descriptor: {}
+  selector:
+    matchExpressions:
+    - key: app
+      operator: In
+      values:
+      - knawd-deployer
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: kanwd-deployer-subscription
+  namespace: knawd
+  labels:
+    app: knawd-deployer
+spec:
+  channel: knawd/github-knawd-deployer-yaml
+  placement:
+    placementRef:
+      kind: PlacementRule
+      name: wasm-clusters
